@@ -25,7 +25,11 @@
         "zip"
       ],
       "category": "public.app-category.productivity",
-      "icon": "resources/icon.icns"
+      "icon": "resources/icon.icns",
+      "signingIdentity": "Developer ID Application",
+      "sign": "./build/entitlements.mac.plist",
+      "entitlements": "./build/entitlements.mac.plist",
+      "entitlementsInherit": "./build/entitlements.mac.plist"
     },
     "dmg": {
       "title": "Tasks",

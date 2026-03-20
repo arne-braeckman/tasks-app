@@ -62,5 +62,27 @@ export const releaseNotesData: Record<string, ReleaseNote[]> = {
       "title": "Dark Mode Fine-Tuning",
       "description": "Refined colors for better readability in low-light environments. High-contrast mode now available in settings for accessibility. OLED users will love the pure blacks."
     }
+  ],
+  "1.0.3": [
+    {
+      "title": "✨ Custom Tag Management",
+      "description": "Create and delete your own tags! No longer limited to predefined tags. Click the '+' button next to TAGS in the sidebar to add new organizational tags. Hover over any tag and click the 'x' to remove it. Perfect for users starting with empty applications."
+    },
+    {
+      "title": "🎯 Kanban Status View Mode",
+      "description": "Switch between Group and Status view modes in the Kanban board. View tasks organized by their status (To Do, In Progress, Done, etc.) while seeing which group each task belongs to. Toggle between views with the Group/Status buttons in the header."
+    },
+    {
+      "title": "✅ Completed Tasks Now Visible in Kanban",
+      "description": "Done and cancelled tasks now properly appear in their respective columns in Kanban Status view. Previously they would disappear—now you can see your complete task lifecycle on the board."
+    },
+    {
+      "title": "📋 Two New Task Statuses",
+      "description": "Added 'On Hold' and 'Waiting for Feedback' statuses alongside the existing To Do, In Progress, Done, and Cancelled states. Better capture your workflow with these intermediate states."
+    },
+    {
+      "title": "🎨 Improved Kanban Card Animations",
+      "description": "Dragging cards between status columns now provides visual feedback with smooth scale and shadow animations. See your cards respond as you drag them to their new status."
+    }
   ]
 }

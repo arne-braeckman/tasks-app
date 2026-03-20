@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Search, Plus, LayoutList, LayoutGrid, Calendar, User, Building2 } from 'lucide-react'
 import { Task, Group, Priority } from '../types'
@@ -15,6 +16,7 @@ interface Props {
   viewMode: 'list' | 'board'
   onToggleView: (mode: 'list' | 'board') => void
   onContextMenu?: (e: React.MouseEvent, task: Task) => void
+  onUpdateTask?: (id: string, updates: Partial<Task>) => void
 }
 
 const priorityColors: Record<Priority, string> = {
@@ -26,17 +28,21 @@ const priorityColors: Record<Priority, string> = {
 }
 
 const statusColors: Record<string, string> = {
-  todo:        'var(--color-text-tertiary)',
-  in_progress: 'var(--color-status-progress)',
-  done:        'var(--color-status-done)',
-  cancelled:   'var(--color-status-cancelled)',
+  todo:                  'var(--color-text-tertiary)',
+  in_progress:           'var(--color-status-progress)',
+  on_hold:               '#F59E0B',
+  waiting_for_feedback:  '#8B5CF6',
+  done:                  'var(--color-status-done)',
+  cancelled:             'var(--color-status-cancelled)',
 }
 
 const statusLabels: Record<string, string> = {
-  todo:        'To Do',
-  in_progress: 'In Progress',
-  done:        'Done',
-  cancelled:   'Cancelled',
+  todo:                  'To Do',
+  in_progress:           'In Progress',
+  on_hold:               'On Hold',
+  waiting_for_feedback:  'Waiting for Feedback',
+  done:                  'Done',
+  cancelled:             'Cancelled',
 }
 
 function formatDueShort(date: string | null): { text: string; color: string } | null {
@@ -52,16 +58,29 @@ function formatDueShort(date: string | null): { text: string; color: string } | 
 }
 
 function KanbanCard({
-  task, selected, onSelect, onContextMenu, index
+  task, selected, onSelect, onContextMenu, index, showGroupBadge, groups, onDragStart
 }: {
   task: Task
   selected: boolean
   onSelect: () => void
   onContextMenu?: (e: React.MouseEvent) => void
   index: number
+  showGroupBadge?: boolean
+  groups?: Group[]
+  onDragStart?: (e: React.DragEvent) => void
 }) {
   const due = formatDueShort(task.dueDate)
   const isDone = task.status === 'done'
+  const [isDragging, setIsDragging] = useState(false)
+
+  const handleDragStart = (e: React.DragEvent) => {
+    setIsDragging(true)
+    onDragStart?.(e)
+  }
+
+  const handleDragEnd = () => {
+    setIsDragging(false)
+  }
 
   return (
     <motion.div
@@ -70,7 +89,10 @@ function KanbanCard({
       transition={{ delay: index * 0.025, duration: 0.2, ease: [0.25, 0.46, 0.45, 0.94] }}
       onClick={onSelect}
       onContextMenu={onContextMenu}
-      className="cursor-pointer rounded-xl transition-all duration-150"
+      draggable
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
+      className="cursor-grab active:cursor-grabbing rounded-xl transition-all duration-150"
       style={{
         background: selected ? 'var(--color-surface)' : 'var(--color-surface)',
         border: selected
@@ -78,10 +100,13 @@ function KanbanCard({
           : '1px solid var(--color-border)',
         padding: '13px 14px',
         marginBottom: '8px',
-        boxShadow: selected
+        boxShadow: isDragging
+          ? '0 12px 24px color-mix(in srgb, var(--color-accent) 20%, transparent)'
+          : selected
           ? '0 2px 12px color-mix(in srgb, var(--color-accent) 12%, transparent)'
           : '0 1px 3px color-mix(in srgb, var(--color-text-primary) 4%, transparent)',
-        opacity: isDone ? 0.6 : 1,
+        opacity: isDragging ? 0.7 : isDone ? 0.6 : 1,
+        transform: isDragging ? 'scale(1.02)' : 'scale(1)',
       }}
     >
       {/* Priority bar + title */}
@@ -112,9 +137,35 @@ function KanbanCard({
         </p>
       </div>
 
+      {/* Group badge (when showing by status) */}
+      {showGroupBadge && task.groupId && groups && (
+        <div style={{ marginTop: '8px' }}>
+          {(() => {
+            const group = groups.find(g => g.id === task.groupId)
+            return group ? (
+              <span
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  fontSize: '11px',
+                  fontWeight: '500',
+                  padding: '3px 8px',
+                  borderRadius: '6px',
+                  background: group.color + '15',
+                  color: group.color,
+                }}
+              >
+                {group.icon} {group.name}
+              </span>
+            ) : null
+          })()}
+        </div>
+      )}
+
       {/* Tags */}
       {task.tags.length > 0 && (
-        <div className="flex flex-wrap" style={{ gap: '4px', marginTop: '8px' }}>
+        <div className="flex flex-wrap" style={{ gap: '4px', marginTop: showGroupBadge && task.groupId ? '6px' : '8px' }}>
           {task.tags.slice(0, 3).map(tag => (
             <span
               key={tag.id}
@@ -213,6 +264,10 @@ function KanbanColumn({
   onSelectTask,
   onContextMenu,
   colIndex,
+  showGroupBadge,
+  groups,
+  columnId,
+  onDropTask,
 }: {
   title: string
   icon?: string
@@ -222,13 +277,32 @@ function KanbanColumn({
   onSelectTask: (id: string) => void
   onContextMenu?: (e: React.MouseEvent, task: Task) => void
   colIndex: number
+  showGroupBadge?: boolean
+  groups?: Group[]
+  columnId?: string
+  onDropTask?: (taskId: string, columnId: string) => void
 }) {
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.dataTransfer!.dropEffect = 'move'
+  }
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault()
+    const taskId = e.dataTransfer!.getData('text/plain')
+    if (taskId && columnId && onDropTask) {
+      onDropTask(taskId, columnId)
+    }
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: colIndex * 0.06, duration: 0.25, ease: [0.25, 0.46, 0.45, 0.94] }}
-      className="flex flex-col flex-shrink-0 rounded-2xl"
+      className="flex flex-col flex-shrink-0 rounded-2xl transition-colors"
+      onDragOver={handleDragOver}
+      onDrop={handleDrop}
       style={{
         width: '280px',
         background: 'var(--color-border-subtle)',
@@ -305,6 +379,12 @@ function KanbanColumn({
               onSelect={() => onSelectTask(task.id)}
               onContextMenu={onContextMenu ? (e) => onContextMenu(e, task) : undefined}
               index={i}
+              showGroupBadge={showGroupBadge}
+              groups={groups}
+              onDragStart={(e) => {
+                e.dataTransfer.effectAllowed = 'move'
+                e.dataTransfer.setData('text/plain', task.id)
+              }}
             />
           ))
         )}
@@ -326,14 +406,102 @@ export default function KanbanView({
   viewMode,
   onToggleView,
   onContextMenu,
+  onUpdateTask,
 }: Props) {
-  // Build columns: one per group + "Inbox" for ungrouped tasks
-  const inboxTasks = tasks.filter(t => !t.groupId && !t.parentId)
+  const [kanbanViewMode, setKanbanViewMode] = useState<'groups' | 'status'>('groups')
 
-  const groupColumns = groups.map(g => ({
-    group: g,
-    tasks: tasks.filter(t => t.groupId === g.id && !t.parentId),
-  }))
+  // Handle dropping a task onto a column
+  const handleDropTask = (taskId: string, columnId: string) => {
+    const task = tasks.find(t => t.id === taskId)
+    if (!task || !onUpdateTask) return
+
+    if (kanbanViewMode === 'groups') {
+      // Update group
+      const newGroupId = columnId === 'inbox' ? null : columnId
+      if (task.groupId !== newGroupId) {
+        onUpdateTask(taskId, { groupId: newGroupId })
+      }
+    } else {
+      // Update status
+      const statusMap: Record<string, string> = {
+        todo: 'todo',
+        in_progress: 'in_progress',
+        on_hold: 'on_hold',
+        waiting_for_feedback: 'waiting_for_feedback',
+        done: 'done',
+        cancelled: 'cancelled',
+      }
+      const newStatus = statusMap[columnId]
+      if (newStatus && task.status !== newStatus) {
+        onUpdateTask(taskId, { status: newStatus as any })
+      }
+    }
+  }
+
+  // Build columns based on kanban view mode
+  let columns: Array<{
+    title: string
+    icon?: string
+    color?: string
+    tasks: Task[]
+    colIndex: number
+  }> = []
+
+  if (kanbanViewMode === 'groups') {
+    // Group-based view: one per group + "Inbox" for ungrouped tasks
+    const inboxTasks = tasks.filter(t => !t.groupId && !t.parentId)
+    const groupColumns = groups.map(g => ({
+      group: g,
+      tasks: tasks.filter(t => t.groupId === g.id && !t.parentId),
+    }))
+
+    if (inboxTasks.length > 0) {
+      columns.push({
+        title: 'Inbox',
+        icon: '📥',
+        tasks: inboxTasks,
+        colIndex: 0,
+      })
+    }
+
+    groupColumns.forEach((col, i) => {
+      columns.push({
+        title: col.group.name,
+        icon: col.group.icon,
+        color: col.group.color,
+        tasks: col.tasks,
+        colIndex: inboxTasks.length > 0 ? i + 1 : i,
+      })
+    })
+  } else {
+    // Status-based view: one per status (To Do, In Progress, On Hold, Waiting for Feedback, Done, Cancelled)
+    const statusOrder = ['todo', 'in_progress', 'on_hold', 'waiting_for_feedback', 'done', 'cancelled']
+    const statusTasksMap: Record<string, Task[]> = {
+      todo: [],
+      in_progress: [],
+      on_hold: [],
+      waiting_for_feedback: [],
+      done: [],
+      cancelled: [],
+    }
+
+    // Group tasks by status, default to 'todo' if no status
+    tasks.filter(t => !t.parentId).forEach(task => {
+      const status = task.status || 'todo'
+      if (statusTasksMap[status]) {
+        statusTasksMap[status].push(task)
+      }
+    })
+
+    statusOrder.forEach((status, i) => {
+      columns.push({
+        title: statusLabels[status],
+        color: statusColors[status],
+        tasks: statusTasksMap[status],
+        colIndex: i,
+      })
+    })
+  }
 
   return (
     <div className="flex-1 flex flex-col min-w-0 h-full bg-(--color-bg)">
@@ -368,6 +536,38 @@ export default function KanbanView({
         </div>
 
         <div className="flex items-center gap-2.5">
+          {/* Kanban view mode toggle (Groups vs Status) */}
+          <div
+            className="flex items-center rounded-lg border border-(--color-border) text-(--color-text-tertiary)"
+            style={{ padding: '0 8px', fontSize: '11px', fontFamily: 'var(--font-mono)' }}
+          >
+            <button
+              onClick={() => setKanbanViewMode('groups')}
+              className="transition-colors"
+              style={{
+                padding: '7px 8px',
+                color: kanbanViewMode === 'groups' ? 'var(--color-accent)' : 'var(--color-text-tertiary)',
+                fontWeight: kanbanViewMode === 'groups' ? '600' : '400',
+                borderRight: '1px solid var(--color-border)',
+              }}
+              title="Group view"
+            >
+              Groups
+            </button>
+            <button
+              onClick={() => setKanbanViewMode('status')}
+              className="transition-colors"
+              style={{
+                padding: '7px 8px',
+                color: kanbanViewMode === 'status' ? 'var(--color-accent)' : 'var(--color-text-tertiary)',
+                fontWeight: kanbanViewMode === 'status' ? '600' : '400',
+              }}
+              title="Status view"
+            >
+              Status
+            </button>
+          </div>
+
           {/* View toggle */}
           <div
             className="flex items-center rounded-lg border border-(--color-border) overflow-hidden"
@@ -433,36 +633,42 @@ export default function KanbanView({
           className="flex h-full"
           style={{ gap: '14px', alignItems: 'flex-start', height: '100%' }}
         >
-          {/* Inbox column (ungrouped tasks) */}
-          {inboxTasks.length > 0 && (
-            <KanbanColumn
-              title="Inbox"
-              icon="📥"
-              tasks={inboxTasks}
-              selectedTaskId={selectedTaskId}
-              onSelectTask={onSelectTask}
-              onContextMenu={onContextMenu}
-              colIndex={0}
-            />
-          )}
+          {/* Columns (groups or status based) */}
+          {columns.map((col) => {
+            // Generate columnId based on view mode
+            let columnId: string
+            if (kanbanViewMode === 'groups') {
+              columnId = col.title === 'Inbox' ? 'inbox' : col.title // Use group name as ID
+              // Find the actual group ID
+              const group = groups.find(g => g.name === col.title)
+              if (group) columnId = group.id
+            } else {
+              // Status mode - use status key
+              const statusKeys = { 'To Do': 'todo', 'In Progress': 'in_progress', 'On Hold': 'on_hold', 'Waiting for Feedback': 'waiting_for_feedback', 'Done': 'done', 'Cancelled': 'cancelled' }
+              columnId = statusKeys[col.title as keyof typeof statusKeys] || col.title
+            }
 
-          {/* Group columns */}
-          {groupColumns.map((col, i) => (
-            <KanbanColumn
-              key={col.group.id}
-              title={col.group.name}
-              icon={col.group.icon}
-              color={col.group.color}
-              tasks={col.tasks}
-              selectedTaskId={selectedTaskId}
-              onSelectTask={onSelectTask}
-              onContextMenu={onContextMenu}
-              colIndex={inboxTasks.length > 0 ? i + 1 : i}
-            />
-          ))}
+            return (
+              <KanbanColumn
+                key={col.title}
+                title={col.title}
+                icon={col.icon}
+                color={col.color}
+                tasks={col.tasks}
+                selectedTaskId={selectedTaskId}
+                onSelectTask={onSelectTask}
+                onContextMenu={onContextMenu}
+                colIndex={col.colIndex}
+                showGroupBadge={kanbanViewMode === 'status'}
+                groups={groups}
+                columnId={columnId}
+                onDropTask={handleDropTask}
+              />
+            )
+          })}
 
           {/* Empty state */}
-          {inboxTasks.length === 0 && groupColumns.every(c => c.tasks.length === 0) && (
+          {columns.every(c => c.tasks.length === 0) && (
             <div
               className="flex flex-col items-center justify-center text-center"
               style={{ width: '100%', height: '240px' }}

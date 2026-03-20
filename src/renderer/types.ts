@@ -1,5 +1,5 @@
 export type Priority = 'none' | 'low' | 'medium' | 'high' | 'urgent'
-export type Status = 'todo' | 'in_progress' | 'done' | 'cancelled'
+export type Status = 'todo' | 'in_progress' | 'on_hold' | 'waiting_for_feedback' | 'done' | 'cancelled'
 
 export interface Tag {
   id: string

@@ -1,33 +1,30 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { X, FolderOpen } from 'lucide-react'
+import { X, Tag } from 'lucide-react'
 
 interface Props {
   onClose: () => void
-  onSave: (name: string, icon: string, color: string) => void
+  onSave: (name: string, color: string) => void
 }
 
-const emojis = ['📁', '🚀', '💰', '⚙️', '📣', '🏠', '📊', '🎯', '💡', '🔬', '📝', '🎨', '🛒', '📞', '🔧', '📦']
-const colors  = ['#6366F1', '#0EA5E9', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899', '#14B8A6', '#F97316', '#6B7280']
+const colors = ['#6366F1', '#0EA5E9', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899', '#14B8A6', '#F97316', '#6B7280']
 
-// Shared field row style — matches detail panel property rows
 const fieldRowStyle: React.CSSProperties = {
   display: 'flex',
-  alignItems: 'center',
+  alignItems: 'flex-start',
   gap: '12px',
   padding: '11px 14px',
   borderRadius: '10px',
   transition: 'background 0.12s',
 }
 
-export default function NewGroupModal({ onClose, onSave }: Props) {
-  const [name,  setName]  = useState('')
-  const [icon,  setIcon]  = useState('📁')
+export default function NewTagModal({ onClose, onSave }: Props) {
+  const [name, setName] = useState('')
   const [color, setColor] = useState('#6366F1')
 
   const handleSave = () => {
     if (!name.trim()) return
-    onSave(name.trim(), icon, color)
+    onSave(name.trim(), color)
   }
 
   return (
@@ -64,7 +61,7 @@ export default function NewGroupModal({ onClose, onSave }: Props) {
               letterSpacing: '-0.02em',
             }}
           >
-            New Group
+            New Tag
           </h3>
           <button
             onClick={onClose}
@@ -77,61 +74,30 @@ export default function NewGroupModal({ onClose, onSave }: Props) {
 
         {/* Form body */}
         <div style={{ padding: '20px 20px 4px' }}>
-
           {/* Name — large, bare input */}
           <input
             autoFocus
             value={name}
             onChange={e => setName(e.target.value)}
             onKeyDown={e => { if (e.key === 'Enter' && name.trim()) handleSave() }}
-            placeholder="Group name"
+            placeholder="Tag name"
             className="w-full bg-transparent border-none outline-none text-(--color-text-primary) placeholder:text-(--color-text-tertiary)"
             style={{
               fontSize: '17px',
               fontWeight: '600',
               fontFamily: 'var(--font-display)',
               letterSpacing: '-0.02em',
-              marginBottom: '10px',
+              marginBottom: '16px',
             }}
           />
         </div>
 
         {/* Field rows — styled like detail panel */}
-        <div style={{ padding: '4px 12px 8px' }}>
-
-          {/* Icon — field row style */}
-          <div
-            className="flex flex-wrap hover:bg-(--color-border-subtle) transition-colors"
-            style={{ ...fieldRowStyle, alignItems: 'flex-start', paddingTop: '13px' }}
-          >
-            <FolderOpen size={14} strokeWidth={1.75} className="text-(--color-text-tertiary) flex-shrink-0" style={{ marginTop: '2px' }} />
-            <span className="section-label" style={{ width: '80px', flexShrink: 0, paddingTop: '2px' }}>Icon</span>
-            <div className="flex items-center flex-wrap" style={{ gap: '6px', flex: 1 }}>
-              {emojis.map(e => (
-                <button
-                  key={e}
-                  onClick={() => setIcon(e)}
-                  className="flex items-center justify-center transition-all"
-                  style={{
-                    width: '32px',
-                    height: '32px',
-                    fontSize: '16px',
-                    borderRadius: '8px',
-                    border: icon === e ? '1.5px solid var(--color-text-secondary)' : '1.5px solid var(--color-border)',
-                    background: icon === e ? 'var(--color-border-subtle)' : 'transparent',
-                    cursor: 'pointer',
-                  }}
-                >
-                  {e}
-                </button>
-              ))}
-            </div>
-          </div>
-
+        <div style={{ padding: '4px 12px 12px' }}>
           {/* Color — field row style */}
           <div
-            className="flex flex-wrap hover:bg-(--color-border-subtle) transition-colors"
-            style={{ ...fieldRowStyle, alignItems: 'flex-start', paddingTop: '13px' }}
+            className="hover:bg-(--color-border-subtle) transition-colors"
+            style={fieldRowStyle}
           >
             <div
               style={{
@@ -140,10 +106,9 @@ export default function NewGroupModal({ onClose, onSave }: Props) {
                 borderRadius: '50%',
                 background: color,
                 flexShrink: 0,
-                marginTop: '2px',
               }}
             />
-            <span className="section-label" style={{ width: '80px', flexShrink: 0, paddingTop: '2px' }}>Color</span>
+            <span className="section-label" style={{ width: '80px', flexShrink: 0 }}>Color</span>
             <div className="flex items-center flex-wrap" style={{ gap: '8px', flex: 1 }}>
               {colors.map(c => (
                 <button
@@ -183,7 +148,7 @@ export default function NewGroupModal({ onClose, onSave }: Props) {
             className="rounded-lg bg-(--color-accent) text-(--color-surface) hover:bg-(--color-accent-hover) transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
             style={{ padding: '8px 18px', fontSize: '13px', fontWeight: '600' }}
           >
-            Create Group
+            Create Tag
           </button>
         </div>
       </motion.div>

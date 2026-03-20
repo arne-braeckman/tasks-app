@@ -16,6 +16,7 @@ interface Props {
   onToggle: () => void
   onToggleSubtask: (id: string) => void
   onDelete: () => void
+  onCreateSubtask: (parentId: string, title: string) => Promise<void>
 }
 
 const priorities: { value: Priority; label: string; color: string }[] = [
@@ -33,12 +34,15 @@ const statuses: { value: Status; label: string; icon: typeof Circle }[] = [
   { value: 'cancelled',   label: 'Cancelled',   icon: AlertCircle },
 ]
 
-export default function DetailPanel({ task, groups, tags, customers, onClose, onUpdate, onToggle, onToggleSubtask, onDelete }: Props) {
+export default function DetailPanel({ task, groups, tags, customers, onClose, onUpdate, onToggle, onToggleSubtask, onDelete, onCreateSubtask }: Props) {
   const [showPriority, setShowPriority] = useState(false)
   const [showStatus, setShowStatus]     = useState(false)
   const [showGroup, setShowGroup]       = useState(false)
   const [editingTitle, setEditingTitle] = useState(false)
   const [editingDesc, setEditingDesc]   = useState(false)
+  const [selectedTagIds, setSelectedTagIds] = useState<string[]>(task.tags.map(t => t.id))
+  const [newSubtaskTitle, setNewSubtaskTitle] = useState('')
+  const [isCreatingSubtask, setIsCreatingSubtask] = useState(false)
 
   useEffect(() => {
     if (!showStatus && !showPriority && !showGroup) return
@@ -70,6 +74,25 @@ export default function DetailPanel({ task, groups, tags, customers, onClose, on
       <div className="flex-1 min-w-0">{children}</div>
     </div>
   )
+
+  const toggleTag = (tagId: string) => {
+    const newSelectedIds = selectedTagIds.includes(tagId)
+      ? selectedTagIds.filter(id => id !== tagId)
+      : [...selectedTagIds, tagId]
+    setSelectedTagIds(newSelectedIds)
+    onUpdate({ tagIds: newSelectedIds } as any)
+  }
+
+  const handleCreateSubtaskClick = async () => {
+    if (!newSubtaskTitle.trim()) return
+    setIsCreatingSubtask(true)
+    try {
+      await onCreateSubtask(task.id, newSubtaskTitle.trim())
+      setNewSubtaskTitle('')
+    } finally {
+      setIsCreatingSubtask(false)
+    }
+  }
 
   return (
     <motion.div
@@ -383,42 +406,77 @@ export default function DetailPanel({ task, groups, tags, customers, onClose, on
         </div>
 
         {/* Tags */}
-        {task.tags.length > 0 && (
-          <>
-            <div className="h-px bg-(--color-border-subtle)" style={{ margin: '16px 0 12px' }} />
-            <div className="flex items-center gap-2 mb-3">
-              <Hash size={13} strokeWidth={1.75} className="text-(--color-text-tertiary)" />
-              <span className="section-label">Tags</span>
+        <div>
+          <div className="h-px bg-(--color-border-subtle)" style={{ margin: '16px 0 12px' }} />
+          <div className="flex items-center gap-2 mb-3" style={{ paddingLeft: '2px' }}>
+            <Hash size={13} strokeWidth={1.75} className="text-(--color-text-tertiary)" />
+            <span className="section-label">Tags</span>
+          </div>
+
+          {/* Selected tags */}
+          {selectedTagIds.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 mb-2" style={{ paddingLeft: '20px' }}>
+              {selectedTagIds.map(tagId => {
+                const tag = tags.find(t => t.id === tagId)
+                if (!tag) return null
+                return (
+                  <button
+                    key={tag.id}
+                    onClick={() => toggleTag(tag.id)}
+                    className="tag-badge cursor-pointer hover:opacity-80 transition-opacity flex items-center gap-1"
+                    style={{ background: tag.color + '18', color: tag.color }}
+                  >
+                    {tag.name}
+                    <X size={12} strokeWidth={2} style={{ marginLeft: '2px' }} />
+                  </button>
+                )
+              })}
             </div>
+          )}
+
+          {/* Available tags to add */}
+          {tags.length > selectedTagIds.length && (
             <div className="flex flex-wrap gap-1.5" style={{ paddingLeft: '20px' }}>
-              {task.tags.map(tag => (
-                <span
-                  key={tag.id}
-                  className="tag-badge"
-                  style={{ background: tag.color + '18', color: tag.color }}
-                >
-                  {tag.name}
-                </span>
-              ))}
+              {tags
+                .filter(tag => !selectedTagIds.includes(tag.id))
+                .map(tag => (
+                  <button
+                    key={tag.id}
+                    onClick={() => toggleTag(tag.id)}
+                    className="tag-badge cursor-pointer hover:opacity-80 transition-opacity"
+                    style={{ background: tag.color + '0F', color: tag.color, opacity: 0.55 }}
+                  >
+                    + {tag.name}
+                  </button>
+                ))
+              }
             </div>
-          </>
-        )}
+          )}
+
+          {tags.length === 0 && (
+            <p style={{ fontSize: '13px', color: 'var(--color-text-tertiary)', fontStyle: 'italic', paddingLeft: '20px' }}>
+              No tags available
+            </p>
+          )}
+        </div>
 
         {/* Subtasks */}
-        {task.subtasks.length > 0 && (
-          <>
-            <div className="h-px bg-(--color-border-subtle)" style={{ margin: '16px 0 12px' }} />
-            <div className="flex items-center gap-2 mb-3">
-              <CheckCircle2 size={13} strokeWidth={1.75} className="text-(--color-text-tertiary)" />
-              <span className="section-label">
-                Subtasks ({task.subtasks.filter(s => s.status === 'done').length}/{task.subtasks.length})
-              </span>
-            </div>
-            <div style={{ paddingLeft: '4px' }}>
+        <div>
+          <div className="h-px bg-(--color-border-subtle)" style={{ margin: '16px 0 12px' }} />
+          <div className="flex items-center gap-2 mb-3" style={{ paddingLeft: '2px' }}>
+            <CheckCircle2 size={13} strokeWidth={1.75} className="text-(--color-text-tertiary)" />
+            <span className="section-label">
+              Subtasks {task.subtasks.length > 0 && `(${task.subtasks.filter(s => s.status === 'done').length}/${task.subtasks.length})`}
+            </span>
+          </div>
+
+          {/* Subtask list */}
+          {task.subtasks.length > 0 && (
+            <div style={{ paddingLeft: '4px', marginBottom: '12px' }}>
               {task.subtasks.map(sub => (
                 <div
                   key={sub.id}
-                  className="flex items-center gap-3 rounded-xl hover:bg-(--color-border-subtle) transition-colors"
+                  className="flex items-center gap-2 rounded-xl hover:bg-(--color-border-subtle) transition-colors"
                   style={{ padding: '8px 10px', marginBottom: '2px' }}
                 >
                   <input
@@ -426,13 +484,14 @@ export default function DetailPanel({ task, groups, tags, customers, onClose, on
                     checked={sub.status === 'done'}
                     onChange={() => onToggleSubtask(sub.id)}
                     className="task-checkbox"
-                    style={{ width: '16px', height: '16px' }}
+                    style={{ width: '16px', height: '16px', flexShrink: 0 }}
                   />
                   <span
                     style={{
                       fontSize: '13.5px',
                       color: sub.status === 'done' ? 'var(--color-text-tertiary)' : 'var(--color-text-primary)',
                       textDecoration: sub.status === 'done' ? 'line-through' : 'none',
+                      flex: 1,
                     }}
                   >
                     {sub.title}
@@ -440,8 +499,39 @@ export default function DetailPanel({ task, groups, tags, customers, onClose, on
                 </div>
               ))}
             </div>
-          </>
-        )}
+          )}
+
+          {/* New subtask input */}
+          <div className="flex gap-2" style={{ paddingLeft: '4px' }}>
+            <input
+              type="text"
+              value={newSubtaskTitle}
+              onChange={(e) => setNewSubtaskTitle(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') handleCreateSubtaskClick()
+              }}
+              placeholder="Add a subtask…"
+              disabled={isCreatingSubtask}
+              className="flex-1 bg-transparent border-b border-(--color-border) rounded-none outline-none"
+              style={{
+                fontSize: '13.5px',
+                color: 'var(--color-text-primary)',
+                paddingBottom: '6px',
+                paddingLeft: '10px',
+                paddingRight: '8px',
+                paddingTop: '4px',
+              }}
+            />
+            <button
+              onClick={handleCreateSubtaskClick}
+              disabled={!newSubtaskTitle.trim() || isCreatingSubtask}
+              className="rounded-lg text-(--color-text-secondary) hover:bg-(--color-border-subtle) hover:text-(--color-text-primary) transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+              style={{ padding: '6px 10px', fontSize: '12px', fontWeight: '500', flexShrink: 0 }}
+            >
+              {isCreatingSubtask ? '…' : 'Add'}
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* Footer */}

@@ -1,6 +1,6 @@
 import {
   Inbox, CalendarDays, CalendarClock, ListTodo, CheckCircle2,
-  Plus, Hash, Sun, Moon, LayoutGrid, RefreshCw
+  Plus, Hash, Sun, Moon, LayoutGrid, RefreshCw, X
 } from 'lucide-react'
 import { SidebarSelection, Group, Tag, Task } from '../types'
 
@@ -13,6 +13,8 @@ interface Props {
   dark: boolean
   onToggleDark: () => void
   onNewGroup: () => void
+  onNewTag: () => void
+  onDeleteTag: (tagId: string) => void
 }
 
 const smartLists = [
@@ -31,7 +33,7 @@ const S = {
   headerPadX: 22,   // left padding of the app header
 }
 
-export default function Sidebar({ selection, onSelect, groups, tags, tasks, dark, onToggleDark, onNewGroup }: Props) {
+export default function Sidebar({ selection, onSelect, groups, tags, tasks, dark, onToggleDark, onNewGroup, onNewTag, onDeleteTag }: Props) {
   const isActive = (type: string, id: string) =>
     selection.type === type && selection.id === id
 
@@ -175,8 +177,18 @@ export default function Sidebar({ selection, onSelect, groups, tags, tasks, dark
 
       {/* Tags */}
       <div className="flex-1 overflow-y-auto min-h-0" style={{ paddingLeft: `${S.sidebarPad}px`, paddingRight: `${S.sidebarPad}px` }}>
-        <div style={{ paddingLeft: `${S.itemPadX}px`, marginBottom: '10px' }}>
+        <div
+          className="flex items-center justify-between"
+          style={{ paddingLeft: `${S.itemPadX}px`, paddingRight: `${S.itemPadX}px`, marginBottom: '10px' }}
+        >
           <span className="section-label">Tags</span>
+          <button
+            onClick={onNewTag}
+            className="rounded-md text-(--color-text-tertiary) hover:text-(--color-text-secondary) hover:bg-(--color-sidebar-active) transition-colors"
+            style={{ padding: '3px' }}
+          >
+            <Plus size={12} strokeWidth={2.5} />
+          </button>
         </div>
         <div
           className="flex flex-wrap"
@@ -185,19 +197,34 @@ export default function Sidebar({ selection, onSelect, groups, tags, tasks, dark
           {tags.map(tag => {
             const active = isActive('tag', tag.id)
             return (
-              <button
+              <div
                 key={tag.id}
-                onClick={() => onSelect({ type: 'tag', id: tag.id })}
-                className={`tag-badge cursor-pointer transition-all duration-150 ${
-                  active
-                    ? 'opacity-100 ring-1 ring-(--color-text-tertiary)/30'
-                    : 'opacity-55 hover:opacity-90'
-                }`}
-                style={{ background: tag.color + '1A', color: tag.color }}
+                className="group relative inline-flex"
               >
-                <Hash size={9} />
-                {tag.name}
-              </button>
+                <button
+                  onClick={() => onSelect({ type: 'tag', id: tag.id })}
+                  className={`tag-badge cursor-pointer transition-all duration-150 ${
+                    active
+                      ? 'opacity-100 ring-1 ring-(--color-text-tertiary)/30'
+                      : 'opacity-55 hover:opacity-90'
+                  }`}
+                  style={{ background: tag.color + '1A', color: tag.color }}
+                >
+                  <Hash size={9} />
+                  {tag.name}
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    onDeleteTag(tag.id)
+                  }}
+                  className="absolute -top-1 -right-1 rounded-full bg-(--color-bg) text-(--color-text-tertiary) hover:text-(--color-text-secondary) opacity-0 group-hover:opacity-100 transition-opacity"
+                  style={{ padding: '1px', width: '14px', height: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                  title="Delete tag"
+                >
+                  <X size={10} strokeWidth={2.5} />
+                </button>
+              </div>
             )
           })}
         </div>

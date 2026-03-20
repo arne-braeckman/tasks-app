@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { SidebarSelection, Task, Group, Tag } from './types'
-import { filterTasks, toggleTaskInList, updateTaskInList, createTask as createMockTask, mockTasks, mockGroups, mockTags } from './store'
+import { filterTasks, filterTasksForKanban, toggleTaskInList, updateTaskInList, createTask as createMockTask, createTag as createMockTag, deleteTagFromTasks, mockTasks, mockGroups, mockTags } from './store'
 import Sidebar from './components/Sidebar'
 import TaskList from './components/TaskList'
 import KanbanView from './components/KanbanView'
@@ -8,6 +8,7 @@ import DetailPanel from './components/DetailPanel'
 import SearchModal from './components/SearchModal'
 import NewTaskModal from './components/NewTaskModal'
 import NewGroupModal from './components/NewGroupModal'
+import NewTagModal from './components/NewTagModal'
 import ContextMenu, { ContextMenuState } from './components/ContextMenu'
 import UpdateBanner from './components/UpdateBanner'
 
@@ -21,6 +22,7 @@ export default function App() {
   const [showSearch, setShowSearch] = useState(false)
   const [showNewTask, setShowNewTask] = useState(false)
   const [showNewGroup, setShowNewGroup] = useState(false)
+  const [showNewTag, setShowNewTag] = useState(false)
   const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null)
   const [viewMode, setViewMode] = useState<'list' | 'board'>('list')
 
@@ -50,6 +52,7 @@ export default function App() {
   }, [loadData])
 
   const filteredTasks = filterTasks(tasks, selection, search)
+  const kanbanTasks = filterTasksForKanban(tasks, selection, search)
   const selectedTask = selectedTaskId
     ? tasks.find(t => t.id === selectedTaskId) ||
       tasks.flatMap(t => t.subtasks).find(t => t.id === selectedTaskId) || null
@@ -78,12 +81,13 @@ export default function App() {
         if (showSearch) setShowSearch(false)
         else if (showNewTask) setShowNewTask(false)
         else if (showNewGroup) setShowNewGroup(false)
+        else if (showNewTag) setShowNewTag(false)
         else setSelectedTaskId(null)
       }
     }
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
-  }, [showSearch, showNewTask, showNewGroup])
+  }, [showSearch, showNewTask, showNewGroup, showNewTag])
 
   // Handlers that work with both IPC and mock data
   const handleToggleTask = async (id: string) => {
@@ -131,6 +135,33 @@ export default function App() {
     setShowNewGroup(false)
   }
 
+  const handleAddTag = async (name: string, color: string) => {
+    if (window.api) {
+      await window.api.tags.create({ name, color })
+    } else {
+      setTags(prev => [...prev, createMockTag(name, color)])
+    }
+    setShowNewTag(false)
+  }
+
+  const handleDeleteTag = async (tagId: string) => {
+    if (window.api) {
+      await window.api.tags.delete(tagId)
+    } else {
+      setTags(prev => prev.filter(t => t.id !== tagId))
+      setTasks(prev => deleteTagFromTasks(prev, tagId))
+    }
+  }
+
+  const handleCreateSubtask = async (parentId: string, title: string) => {
+    if (!title.trim()) return
+    if (window.api) {
+      await window.api.tasks.create({ title: title.trim(), parentId })
+    } else {
+      setTasks(prev => [createMockTask({ title: title.trim(), parentId }), ...prev])
+    }
+  }
+
   const getSelectionTitle = () => {
     if (selection.type === 'smart') {
       return { inbox: 'Inbox', today: 'Today', upcoming: 'Upcoming', all: 'All Tasks', completed: 'Completed' }[selection.id] || 'Tasks'
@@ -165,6 +196,8 @@ export default function App() {
         dark={dark}
         onToggleDark={() => setDark(!dark)}
         onNewGroup={() => setShowNewGroup(true)}
+        onNewTag={() => setShowNewTag(true)}
+        onDeleteTag={handleDeleteTag}
       />
 
       {viewMode === 'list' ? (
@@ -187,8 +220,8 @@ export default function App() {
       ) : (
         <KanbanView
           title={getSelectionTitle()}
-          count={filteredTasks.length}
-          tasks={filteredTasks}
+          count={kanbanTasks.length}
+          tasks={kanbanTasks}
           groups={groups}
           selectedTaskId={selectedTaskId}
           onSelectTask={setSelectedTaskId}
@@ -201,6 +234,7 @@ export default function App() {
             e.preventDefault()
             setContextMenu({ x: e.clientX, y: e.clientY, task })
           }}
+          onUpdateTask={handleUpdateTask}
         />
       )}
 
@@ -215,6 +249,7 @@ export default function App() {
           onToggle={() => handleToggleTask(selectedTask.id)}
           onToggleSubtask={handleToggleTask}
           onDelete={() => handleDeleteTask(selectedTask.id)}
+          onCreateSubtask={handleCreateSubtask}
         />
       )}
 
@@ -241,6 +276,13 @@ export default function App() {
         <NewGroupModal
           onClose={() => setShowNewGroup(false)}
           onSave={handleAddGroup}
+        />
+      )}
+
+      {showNewTag && (
+        <NewTagModal
+          onClose={() => setShowNewTag(false)}
+          onSave={handleAddTag}
         />
       )}
 

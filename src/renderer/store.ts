@@ -124,4 +124,87 @@ export function createTask(task: Partial<Task> & { title: string }): Task {
   }
 }
 
+// Filter tasks for Kanban view (includes done/cancelled tasks)
+export function filterTasksForKanban(tasks: Task[], selection: SidebarSelection, search: string): Task[] {
+  let filtered = tasks.filter(t => !t.parentId)
+
+  const today = new Date().toISOString().split('T')[0]
+  const nextWeek = new Date()
+  nextWeek.setDate(nextWeek.getDate() + 7)
+  const nextWeekStr = nextWeek.toISOString().split('T')[0]
+
+  switch (selection.type) {
+    case 'smart':
+      switch (selection.id) {
+        case 'inbox':
+          filtered = filtered.filter(t => !t.groupId)
+          break
+        case 'today':
+          filtered = filtered.filter(t => t.dueDate === today)
+          break
+        case 'upcoming':
+          filtered = filtered.filter(t => t.dueDate && t.dueDate > today && t.dueDate <= nextWeekStr)
+          break
+        case 'completed':
+          filtered = filtered.filter(t => t.status === 'done')
+          break
+        case 'all':
+        default:
+          // For Kanban, show all tasks including done/cancelled
+          break
+      }
+      break
+    case 'group':
+      filtered = filtered.filter(t => t.groupId === selection.id)
+      break
+    case 'tag':
+      filtered = filtered.filter(t => t.tags.some(tag => tag.id === selection.id))
+      break
+  }
+
+  if (search.trim()) {
+    const q = search.toLowerCase()
+    filtered = filtered.filter(t =>
+      t.title.toLowerCase().includes(q) ||
+      t.description.toLowerCase().includes(q) ||
+      t.assignee.toLowerCase().includes(q)
+    )
+  }
+
+  const priorityOrder: Record<Priority, number> = { urgent: 0, high: 1, medium: 2, low: 3, none: 4 }
+  filtered.sort((a, b) => {
+    const pa = priorityOrder[a.priority]
+    const pb = priorityOrder[b.priority]
+    if (pa !== pb) return pa - pb
+    if (a.dueDate && b.dueDate) return a.dueDate.localeCompare(b.dueDate)
+    if (a.dueDate) return -1
+    if (b.dueDate) return 1
+    return 0
+  })
+
+  return filtered
+}
+
+export function createTag(name: string, color: string): Tag {
+  return {
+    id: crypto.randomUUID(),
+    name,
+    color,
+  }
+}
+
+export function deleteTagFromTasks(tasks: Task[], tagId: string): Task[] {
+  return tasks.map(t => {
+    const newTask = { ...t }
+    newTask.tags = newTask.tags.filter(tag => tag.id !== tagId)
+    if (t.subtasks.length > 0) {
+      newTask.subtasks = t.subtasks.map(st => ({
+        ...st,
+        tags: st.tags.filter(tag => tag.id !== tagId)
+      }))
+    }
+    return newTask
+  })
+}
+
 export { mockTasks, mockGroups, mockTags }

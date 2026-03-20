@@ -61,6 +61,7 @@ function TaskRow({ task, selected, onSelect, onToggle, onContextMenu, index }: {
   const subtasksDone = task.subtasks.filter(s => s.status === 'done').length
   const subtasksTotal = task.subtasks.length
   const dueStyle = due ? dueDateStyles[due.className] : null
+  const isReleaseNote = task.tags.some(t => t.name === 'system:release-notes')
 
   return (
     <motion.div
@@ -74,7 +75,15 @@ function TaskRow({ task, selected, onSelect, onToggle, onContextMenu, index }: {
         className={`group flex items-start gap-3.5 rounded-xl cursor-pointer transition-all duration-150 ${
           selected ? 'task-row-selected' : 'hover:bg-(--color-surface)/60'
         }`}
-        style={{ margin: '0 10px', padding: '14px 18px' }}
+        style={{
+          margin: '0 10px',
+          padding: '14px 18px',
+          ...(isReleaseNote && {
+            background: 'linear-gradient(135deg, #F39C1208 0%, #FBB00014 100%)',
+            border: '1px solid #F39C1220',
+            boxShadow: '0 2px 8px rgba(243, 156, 18, 0.08)',
+          })
+        }}
       >
         {/* Circular checkbox */}
         <div className="flex-shrink-0" style={{ paddingTop: '2px' }}>
@@ -133,8 +142,26 @@ function TaskRow({ task, selected, onSelect, onToggle, onContextMenu, index }: {
               </div>
             )}
 
+            {/* Release Notes Badge */}
+            {isReleaseNote && (
+              <span
+                className="tag-badge font-semibold"
+                style={{
+                  background: '#F39C1228',
+                  color: '#D68910',
+                  fontSize: '11px',
+                  fontWeight: '600'
+                }}
+              >
+                ✨ Release Notes
+              </span>
+            )}
+
             {/* Tags */}
-            {task.tags.slice(0, 3).map(tag => (
+            {task.tags
+              .filter(tag => tag.name !== 'system:release-notes')
+              .slice(0, 3)
+              .map(tag => (
               <span
                 key={tag.id}
                 className="tag-badge"

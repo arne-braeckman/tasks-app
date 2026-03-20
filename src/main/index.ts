@@ -1,8 +1,10 @@
 import { app, BrowserWindow, shell } from 'electron'
 import { join } from 'path'
 import { registerIpcHandlers } from './ipc/handlers'
-import { closeDb } from './database/connection'
+import { closeDb, getDb } from './database/connection'
 import { initAutoUpdater, checkForUpdates } from './services/updateService'
+import { initializeReleaseNotes } from './services/releaseNotesService'
+import { releaseNotesData } from './data/releaseNotesData'
 
 let mainWindow: BrowserWindow | null = null
 
@@ -42,6 +44,23 @@ function createWindow() {
 app.whenReady().then(() => {
   registerIpcHandlers()
   initAutoUpdater()
+
+  // Initialize release notes for the current version
+  const packageJson = JSON.parse(
+    require('fs').readFileSync(join(__dirname, '../../package.json'), 'utf-8')
+  )
+  const currentVersion = packageJson.version
+  const db = getDb()
+
+  // Store release notes data in database if available
+  if (releaseNotesData[currentVersion]) {
+    const releaseNotesService = require('./services/releaseNotesService')
+    releaseNotesService.storeReleaseNotes(db, currentVersion, releaseNotesData[currentVersion])
+  }
+
+  // Initialize and create release note tasks if this is a new version
+  initializeReleaseNotes(db, currentVersion)
+
   createWindow()
 
   // Auto-check for updates 3s after launch (skip in dev mode)

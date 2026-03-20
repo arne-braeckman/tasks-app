@@ -1,0 +1,22 @@
+[
+  {
+    "title": "Unified Design System",
+    "description": "Complete visual overhaul with a cohesive design language across all components. Every button, badge, and border now follows a consistent rhythm and color palette for a more polished experience."
+  },
+  {
+    "title": "MCP Server Integration",
+    "description": "Behind-the-scenes infrastructure now supports the Model Context Protocol. This paves the way for powerful AI-assisted features and third-party integrations coming in future releases."
+  },
+  {
+    "title": "Build Pipeline Optimization",
+    "description": "Introduced MCPB build system for faster compilation and better asset management. Development and production builds are now more efficient and reliable."
+  },
+  {
+    "title": "Improved Dark Mode",
+    "description": "Dark mode now respects your system preferences automatically and transitions smoothly between modes without jarring color shifts."
+  },
+  {
+    "title": "Bug Fixes & Stability",
+    "description": "Fixed several edge cases with subtask rendering, improved database query performance, and resolved memory leaks in long-running sessions."
+  }
+]

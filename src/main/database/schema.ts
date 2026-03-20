@@ -47,3 +47,15 @@ export const taskTags = sqliteTable('task_tags', {
   primaryKey({ columns: [table.taskId, table.tagId] }),
   index('idx_task_tags_tag').on(table.tagId),
 ])
+
+export const releaseNotes = sqliteTable('release_notes', {
+  version: text('version').primaryKey(),
+  notes: text('notes').notNull(), // JSON array of note objects
+  createdAt: text('created_at').notNull(),
+})
+
+export const appConfig = sqliteTable('app_config', {
+  key: text('key').primaryKey(),
+  value: text('value').notNull(),
+  updatedAt: text('updated_at').notNull(),
+})

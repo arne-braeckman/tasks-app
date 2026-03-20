@@ -5,14 +5,16 @@
   "main": "./out/main/index.js",
   "scripts": {
     "dev": "electron-vite dev",
-    "build": "electron-vite build",
+    "build": "node scripts/verify-release-notes.mjs && node scripts/build-release-notes.mjs && electron-vite build",
     "preview": "electron-vite preview",
     "build:mcp": "vite build --config vite.mcp.config.ts",
     "build:mcpb": "bash scripts/build-mcpb.sh",
     "dev:mcp": "node out/mcp/run.cjs",
     "dev:web": "vite --config vite.preview.config.ts",
-    "dist": "electron-vite build && electron-builder --mac",
-    "release": "electron-vite build && electron-builder --mac --publish always"
+    "verify:release-notes": "node scripts/verify-release-notes.mjs",
+    "build:release-notes": "node scripts/build-release-notes.mjs",
+    "dist": "node scripts/verify-release-notes.mjs && node scripts/build-release-notes.mjs && electron-vite build && electron-builder --mac",
+    "release": "node scripts/verify-release-notes.mjs && node scripts/build-release-notes.mjs && electron-vite build && electron-builder --mac --publish always"
   },
   "build": {
     "appId": "com.tasks-app.desktop",

@@ -86,7 +86,7 @@ export default function ContextMenu({ state, groups, onClose, onUpdate, onDelete
 
   const renderSubmenu = (items: MenuItem[]) => (
     <div className="absolute left-full top-0 ml-1">
-      <div className="bg-(--color-surface) border border-(--color-border) rounded-lg shadow-lg py-1 min-w-[150px] overflow-hidden">
+      <div className="bg-(--color-surface) rounded-lg py-1 overflow-hidden" style={{ minWidth: '150px', border: '1px solid var(--color-border)', boxShadow: '0 8px 24px color-mix(in srgb, var(--color-accent) 12%, transparent), 0 0 0 1px var(--color-border)' }}>
         {items.map((item, i) => (
           <button
             key={i}
@@ -115,7 +115,8 @@ export default function ContextMenu({ state, groups, onClose, onUpdate, onDelete
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.1 }}
         style={{ left: clampedX, top: clampedY }}
-        className="absolute bg-(--color-surface) border border-(--color-border) rounded-lg shadow-xl py-1 min-w-[190px] overflow-visible"
+        className="absolute bg-(--color-surface) rounded-lg py-1 overflow-visible"
+        style={{ minWidth: '190px', border: '1px solid var(--color-border)', boxShadow: '0 8px 32px color-mix(in srgb, var(--color-accent) 14%, transparent), 0 0 0 1px var(--color-border)' }}
       >
         <button
           onClick={() => { onToggle(task.id); onClose() }}
@@ -168,7 +169,7 @@ export default function ContextMenu({ state, groups, onClose, onUpdate, onDelete
 
         <button
           onClick={() => { onDelete(task.id); onClose() }}
-          className="w-full flex items-center gap-2.5 px-3 py-[7px] text-[13px] text-(--color-priority-urgent) hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors text-left"
+          className="w-full flex items-center gap-2.5 px-3 py-[7px] text-[13px] text-(--color-priority-urgent) hover:bg-(--color-border-subtle) transition-colors text-left"
         >
           <Trash2 size={13} strokeWidth={1.8} />
           Delete Task

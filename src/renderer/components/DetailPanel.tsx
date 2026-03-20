@@ -97,7 +97,7 @@ export default function DetailPanel({ task, groups, tags, customers, onClose, on
         <div className="flex items-center gap-1">
           <button
             onClick={onDelete}
-            className="rounded-lg text-(--color-text-tertiary) hover:text-(--color-priority-urgent) hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+            className="rounded-lg text-(--color-text-tertiary) hover:text-(--color-priority-urgent) hover:bg-(--color-border-subtle) transition-colors"
             style={{ padding: '7px' }}
           >
             <Trash2 size={14} strokeWidth={1.75} />
@@ -215,7 +215,8 @@ export default function DetailPanel({ task, groups, tags, customers, onClose, on
             </button>
             {showStatus && (
               <div
-                className="absolute left-0 right-0 top-full z-20 mt-1.5 bg-(--color-surface) border border-(--color-border) rounded-xl overflow-hidden shadow-lg"
+                className="absolute left-0 right-0 top-full z-20 mt-1.5 bg-(--color-surface) rounded-xl overflow-hidden"
+                style={{ border: '1px solid var(--color-border)', boxShadow: '0 8px 24px color-mix(in srgb, var(--color-accent) 12%, transparent), 0 0 0 1px var(--color-border)' }}
                 style={{ paddingTop: '4px', paddingBottom: '4px' }}
               >
                 {statuses.map(s => (
@@ -254,7 +255,8 @@ export default function DetailPanel({ task, groups, tags, customers, onClose, on
             </button>
             {showPriority && (
               <div
-                className="absolute left-0 right-0 top-full z-20 mt-1.5 bg-(--color-surface) border border-(--color-border) rounded-xl overflow-hidden shadow-lg"
+                className="absolute left-0 right-0 top-full z-20 mt-1.5 bg-(--color-surface) rounded-xl overflow-hidden"
+                style={{ border: '1px solid var(--color-border)', boxShadow: '0 8px 24px color-mix(in srgb, var(--color-accent) 12%, transparent), 0 0 0 1px var(--color-border)' }}
                 style={{ paddingTop: '4px', paddingBottom: '4px' }}
               >
                 {priorities.map(p => (
@@ -351,7 +353,8 @@ export default function DetailPanel({ task, groups, tags, customers, onClose, on
             </button>
             {showGroup && (
               <div
-                className="absolute left-0 right-0 top-full z-20 mt-1.5 bg-(--color-surface) border border-(--color-border) rounded-xl overflow-hidden shadow-lg"
+                className="absolute left-0 right-0 top-full z-20 mt-1.5 bg-(--color-surface) rounded-xl overflow-hidden"
+                style={{ border: '1px solid var(--color-border)', boxShadow: '0 8px 24px color-mix(in srgb, var(--color-accent) 12%, transparent), 0 0 0 1px var(--color-border)' }}
                 style={{ paddingTop: '4px', paddingBottom: '4px' }}
               >
                 <button

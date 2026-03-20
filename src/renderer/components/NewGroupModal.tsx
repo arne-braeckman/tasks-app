@@ -27,7 +27,8 @@ export default function NewGroupModal({ onClose, onSave }: Props) {
         animate={{ opacity: 1, scale: 1, y: 0 }}
         transition={{ duration: 0.15, ease: [0.25, 0.46, 0.45, 0.94] }}
         onClick={e => e.stopPropagation()}
-        className="w-full max-w-sm bg-(--color-surface) rounded-xl shadow-2xl border border-(--color-border) overflow-hidden"
+        className="w-full max-w-sm bg-(--color-surface) rounded-xl overflow-hidden"
+        style={{ boxShadow: '0 8px 40px color-mix(in srgb, var(--color-accent) 18%, transparent), 0 0 0 1px var(--color-border)' }}
       >
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-3.5 border-b border-(--color-border-subtle)">

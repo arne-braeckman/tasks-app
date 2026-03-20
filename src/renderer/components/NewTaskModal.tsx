@@ -265,11 +265,10 @@ export default function NewTaskModal({ groups, tags, customers, defaultGroupId, 
                       onClick={() => toggleTag(tag)}
                       className="tag-badge cursor-pointer transition-all"
                       style={{
-                        background: tag.color + (active ? '22' : '0F'),
+                        background: tag.color + (active ? '18' : '0F'),
                         color: tag.color,
-                        opacity: active ? 1 : 0.6,
-                        outline: active ? `1.5px solid ${tag.color}40` : 'none',
-                        outlineOffset: '0px',
+                        opacity: active ? 1 : 0.55,
+                        boxShadow: active ? `0 0 0 1.5px ${tag.color}50` : 'none',
                       }}
                     >
                       {tag.name}

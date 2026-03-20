@@ -183,7 +183,7 @@ function KanbanCard({
             fontSize: '10.5px',
             fontFamily: 'var(--font-body)',
             color: statusColors[task.status],
-            background: statusColors[task.status] + '14',
+            background: statusColors[task.status] + '18',
             padding: '2px 7px',
             borderRadius: '99px',
           }}

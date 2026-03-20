@@ -23,6 +23,7 @@ export interface UpdateStatus {
     total: number
   }
   error?: string
+  errorType?: 'read-only-volume' | 'no-space' | 'permission' | 'network' | 'unknown'
 }
 
 let currentStatus: UpdateStatus = { state: 'idle' }
@@ -89,7 +90,26 @@ export function initAutoUpdater() {
   })
 
   autoUpdater.on('error', (err) => {
-    broadcastStatus({ state: 'error', error: err.message })
+    const message = err.message.toLowerCase()
+    let errorType: UpdateStatus['errorType'] = 'unknown'
+    let userMessage = err.message
+
+    // Detect and categorize specific errors
+    if (message.includes('read-only') || message.includes('read only')) {
+      errorType = 'read-only-volume'
+      userMessage = 'App is on a read-only volume. Move it to Applications folder and try again.'
+    } else if (message.includes('no space') || message.includes('disk space')) {
+      errorType = 'no-space'
+      userMessage = 'Not enough disk space for update. Free up space and try again.'
+    } else if (message.includes('permission') || message.includes('eacces')) {
+      errorType = 'permission'
+      userMessage = 'Permission denied. Check application folder permissions.'
+    } else if (message.includes('network') || message.includes('enotfound') || message.includes('timeout')) {
+      errorType = 'network'
+      userMessage = 'Network error. Check your internet connection and try again.'
+    }
+
+    broadcastStatus({ state: 'error', error: userMessage, errorType })
   })
 }
 
@@ -107,4 +127,9 @@ export function installUpdate() {
 
 export function getStatus(): UpdateStatus {
   return currentStatus
+}
+
+export function getDownloadUrl(version: string): string {
+  // GitHub releases URL format
+  return `https://github.com/arne-braeckman/tasks-app/releases/tag/v${version}`
 }

@@ -1,6 +1,9 @@
-import { contextBridge, ipcRenderer } from 'electron'
+import { contextBridge, ipcRenderer, shell } from 'electron'
 
 const api = {
+  shell: {
+    openExternal: (url: string) => shell.openExternal(url),
+  },
   tasks: {
     list: (filters?: any) => ipcRenderer.invoke('tasks:list', filters),
     get: (id: string) => ipcRenderer.invoke('tasks:get', id),

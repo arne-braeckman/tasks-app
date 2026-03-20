@@ -1,4 +1,7 @@
 interface TasksAPI {
+  shell: {
+    openExternal: (url: string) => Promise<void>
+  }
   tasks: {
     list: (filters?: any) => Promise<any[]>
     get: (id: string) => Promise<any>
@@ -19,6 +22,12 @@ interface TasksAPI {
     delete: (id: string) => Promise<boolean>
     assign: (taskId: string, tagId: string) => Promise<void>
     unassign: (taskId: string, tagId: string) => Promise<void>
+  }
+  updater: {
+    check: () => Promise<any>
+    download: () => Promise<void>
+    install: () => void
+    onStatus: (callback: (status: any) => void) => () => void
   }
   onDataChanged: (callback: () => void) => () => void
 }

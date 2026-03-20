@@ -32,7 +32,11 @@
       "Bash(python3 -c \"import sys,json; p=json.load\\(sys.stdin\\); print\\(json.dumps\\(p.get\\(''''build'''', p.get\\(''''scripts'''',{}\\)\\), indent=2\\)\\)\")",
       "Bash(python3 -c \"import sys,json; p=json.load\\(sys.stdin\\); print\\(json.dumps\\(p.get\\(''''scripts'''',{}\\), indent=2\\)\\)\")",
       "Bash(open \"/Users/arnebraeckman/Desktop/Claude - TC/Tasks/release/\")",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(npx vite:*)",
+      "Bash(perl -e \"alarm 5; exec @ARGV\" ./out/mcp/tasks-mcp)",
+      "Bash(printf '{\"\"\"\"jsonrpc\"\"\"\":\"\"\"\"2.0\"\"\"\",\"\"\"\"method\"\"\"\":\"\"\"\"initialize\"\"\"\",\"\"\"\"params\"\"\"\":{\"\"\"\"protocolVersion\"\"\"\":\"\"\"\"2024-11-05\"\"\"\",\"\"\"\"capabilities\"\"\"\":{},\"\"\"\"clientInfo\"\"\"\":{\"\"\"\"name\"\"\"\":\"\"\"\"test\"\"\"\",\"\"\"\"version\"\"\"\":\"\"\"\"1.0.0\"\"\"\"}},\"\"\"\"id\"\"\"\":1}\\\\n{\"\"\"\"jsonrpc\"\"\"\":\"\"\"\"2.0\"\"\"\",\"\"\"\"method\"\"\"\":\"\"\"\"notifications/initialized\"\"\"\"}\\\\n{\"\"\"\"jsonrpc\"\"\"\":\"\"\"\"2.0\"\"\"\",\"\"\"\"method\"\"\"\":\"\"\"\"tools/call\"\"\"\",\"\"\"\"params\"\"\"\":{\"\"\"\"name\"\"\"\":\"\"\"\"list_tasks\"\"\"\",\"\"\"\"arguments\"\"\"\":{}},\"\"\"\"id\"\"\"\":3}\\\\n')",
+      "Bash(python3 -c \"import sys,json; r=json.loads\\(sys.stdin.read\\(\\)\\); tasks=json.loads\\(r[''''result''''][''''content''''][0][''''text'''']\\); print\\(f''''{len\\(tasks\\)} tasks found''''\\)\")"
     ]
   }
 }

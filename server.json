@@ -1,0 +1,21 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.arne-braeckman/tasks-mcp",
+  "title": "Tasks",
+  "description": "Manage tasks, groups, and tags from the Tasks desktop app. Create, update, complete, and organize tasks with priorities, due dates, assignees, and custom tags.",
+  "repository": {
+    "url": "https://github.com/arne-braeckman/tasks-app",
+    "source": "github"
+  },
+  "version": "1.0.0",
+  "packages": [
+    {
+      "registryType": "mcpb",
+      "identifier": "https://github.com/arne-braeckman/tasks-app/releases/download/v1.0.0/tasks-mcp.mcpb",
+      "fileSha256": "a0eca02bd71b511e81fab2410af5500e687a0a16b5a369e86562396559b4bf7a",
+      "transport": {
+        "type": "stdio"
+      }
+    }
+  ]
+}

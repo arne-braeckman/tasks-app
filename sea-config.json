@@ -1,0 +1,8 @@
+{
+  "main": "out/mcp/sea-entry.cjs",
+  "output": "out/mcp/sea-prep.blob",
+  "disableExperimentalSEAWarning": true,
+  "assets": {
+    "better_sqlite3.node": "mcp-deps/node_modules/better-sqlite3/build/Release/better_sqlite3.node"
+  }
+}

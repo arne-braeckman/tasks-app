@@ -8,6 +8,7 @@
     "build": "electron-vite build",
     "preview": "electron-vite preview",
     "build:mcp": "vite build --config vite.mcp.config.ts",
+    "build:mcpb": "bash scripts/build-mcpb.sh",
     "dev:mcp": "node out/mcp/run.cjs",
     "dev:web": "vite --config vite.preview.config.ts",
     "dist": "electron-vite build && electron-builder --mac",

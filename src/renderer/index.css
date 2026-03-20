@@ -1,0 +1,223 @@
+@import "tailwindcss";
+
+/* ══════════════════════════════════════════════════════
+   TASKS — Warm Craft
+   Premium task management with editorial warmth.
+   Inspired by Things 3 × Apple Notes × Bear.
+   ══════════════════════════════════════════════════════ */
+
+@theme {
+  /* Typography */
+  --font-display: "Lora", Georgia, serif;
+  --font-body:    "Figtree", system-ui, sans-serif;
+  --font-mono:    "JetBrains Mono", "Fira Mono", monospace;
+
+  /* ── Light — warm linen ── */
+  --color-bg:              #F7F4EF;
+  --color-sidebar:         #EFE9E1;
+  --color-sidebar-active:  #E5DDD2;
+  --color-surface:         #FFFEFB;
+  --color-accent:          #2A1A0A;
+  --color-accent-hover:    #3D2815;
+  --color-warm:            #B8752A;
+  --color-warm-soft:       #F5EDE1;
+  --color-text-primary:    #1C1209;
+  --color-text-secondary:  #6A5842;
+  --color-text-tertiary:   #A89078;
+  --color-border:          #DDD3C7;
+  --color-border-subtle:   #EAE3DA;
+
+  /* Priority — warm functional */
+  --color-priority-urgent: #C0392B;
+  --color-priority-high:   #BF6E1A;
+  --color-priority-medium: #2563EB;
+  --color-priority-low:    #8A9BAA;
+  --color-priority-none:   #C8BFB4;
+
+  /* Status */
+  --color-status-done:     #1D9A55;
+  --color-status-progress: #2563EB;
+  --color-status-cancelled:#9CA3AF;
+}
+
+/* ── Dark — espresso warmth ── */
+.dark {
+  --color-bg:              #1A1410;
+  --color-sidebar:         #211A14;
+  --color-sidebar-active:  #2E2418;
+  --color-surface:         #261F18;
+  --color-accent:          #F0E8DC;
+  --color-accent-hover:    #FAF4EC;
+  --color-warm:            #D4903C;
+  --color-warm-soft:       #2E2214;
+  --color-text-primary:    #F0E8DC;
+  --color-text-secondary:  #8C7660;
+  --color-text-tertiary:   #5A4A3A;
+  --color-border:          #342A20;
+  --color-border-subtle:   #281F18;
+  --color-priority-urgent: #E05050;
+  --color-priority-high:   #D08040;
+  --color-priority-medium: #3B82F6;
+  --color-priority-low:    #5A6A7A;
+  --color-priority-none:   #4A3F36;
+  --color-status-done:     #27C468;
+  --color-status-progress: #3B82F6;
+  --color-status-cancelled:#6B7280;
+}
+
+/* ── Reset & base ── */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--color-bg);
+  color: var(--color-text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-size: 13.5px;
+  letter-spacing: -0.006em;
+  line-height: 1.5;
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 99px;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--color-text-tertiary); }
+
+/* ── Circular checkbox — Things 3 style ── */
+.task-checkbox {
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border: 1.5px solid var(--color-border);
+  border-radius: 50%;
+  cursor: pointer;
+  position: relative;
+  transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+  flex-shrink: 0;
+  background: transparent;
+}
+.task-checkbox:hover {
+  border-color: var(--color-warm);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-warm) 12%, transparent);
+}
+.task-checkbox:checked {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+}
+.task-checkbox:checked::after {
+  content: "";
+  position: absolute;
+  left: 5px;
+  top: 2px;
+  width: 5px;
+  height: 9px;
+  border: solid var(--color-surface);
+  border-width: 0 1.5px 1.5px 0;
+  transform: rotate(45deg);
+  animation: checkmark 0.15s ease-out;
+}
+@keyframes checkmark {
+  from { transform: rotate(45deg) scale(0); opacity: 0; }
+  to   { transform: rotate(45deg) scale(1); opacity: 1; }
+}
+
+/* ── Priority dot ── */
+.priority-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ── Tag badge — pill style ── */
+.tag-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 7px 2px 6px;
+  border-radius: 99px;
+  font-size: 11px;
+  font-weight: 500;
+  font-family: var(--font-body);
+  letter-spacing: 0;
+  white-space: nowrap;
+  line-height: 1.6;
+}
+
+/* ── Sidebar nav item — elevated card when active (Things 3 style) ── */
+.nav-item-active {
+  background: var(--color-surface);
+  box-shadow:
+    0 1px 3px color-mix(in srgb, var(--color-accent) 10%, transparent),
+    0 0 0 0.5px color-mix(in srgb, var(--color-accent) 7%, transparent);
+  color: var(--color-text-primary);
+}
+.dark .nav-item-active {
+  background: var(--color-sidebar-active);
+  box-shadow:
+    0 1px 4px color-mix(in srgb, black 30%, transparent),
+    0 0 0 0.5px color-mix(in srgb, white 6%, transparent);
+}
+
+/* ── Task row selected ── */
+.task-row-selected {
+  background: var(--color-surface);
+  box-shadow:
+    0 1px 4px color-mix(in srgb, var(--color-accent) 9%, transparent),
+    0 0 0 1px var(--color-border-subtle);
+}
+.dark .task-row-selected {
+  background: var(--color-surface);
+  box-shadow:
+    0 1px 4px color-mix(in srgb, black 35%, transparent),
+    0 0 0 1px var(--color-border);
+}
+
+/* ── Section label ── */
+.section-label {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-tertiary);
+  font-family: var(--font-body);
+}
+
+/* ── Modal backdrop ── */
+.search-backdrop {
+  background: color-mix(in srgb, var(--color-accent) 18%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+.dark .search-backdrop {
+  background: color-mix(in srgb, black 55%, transparent);
+}
+
+/* ── Panel border ── */
+.panel-border {
+  border-left: 1px solid var(--color-border-subtle);
+}
+
+/* ── Stagger animation ── */
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.stagger-item { animation: fadeSlideIn 0.18s ease-out both; }
+
+/* ── Date input reset ── */
+input[type="date"] { color-scheme: light dark; }
+
+/* ── Divider ── */
+.divider { height: 1px; background: var(--color-border-subtle); }

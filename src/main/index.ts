@@ -1,12 +1,34 @@
 import { app, BrowserWindow, shell } from 'electron'
 import { join } from 'path'
+import { watch, FSWatcher } from 'fs'
 import { registerIpcHandlers } from './ipc/handlers'
 import { closeDb, getDb } from './database/connection'
 import { initAutoUpdater, checkForUpdates } from './services/updateService'
 import { initializeReleaseNotes } from './services/releaseNotesService'
 import { releaseNotesData } from './data/releaseNotesData'
+import { IPC } from './ipc/channels'
 
 let mainWindow: BrowserWindow | null = null
+let dbWatcher: FSWatcher | null = null
+
+function startDbWatcher() {
+  const userDataPath = app.getPath('userData')
+  let debounceTimer: NodeJS.Timeout | null = null
+
+  try {
+    dbWatcher = watch(userDataPath, (_eventType, filename) => {
+      if (!filename || !filename.startsWith('tasks.db')) return
+      if (debounceTimer) clearTimeout(debounceTimer)
+      debounceTimer = setTimeout(() => {
+        BrowserWindow.getAllWindows().forEach(win => {
+          win.webContents.send(IPC.DATA_CHANGED)
+        })
+      }, 300)
+    })
+  } catch (err) {
+    console.error('Failed to watch database directory:', err)
+  }
+}
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -44,6 +66,7 @@ function createWindow() {
 app.whenReady().then(() => {
   registerIpcHandlers()
   initAutoUpdater()
+  startDbWatcher()
 
   // Create the window first — always, before any other init that might throw
   createWindow()
@@ -79,6 +102,7 @@ app.whenReady().then(() => {
 })
 
 app.on('window-all-closed', () => {
+  dbWatcher?.close()
   closeDb()
   if (process.platform !== 'darwin') {
     app.quit()

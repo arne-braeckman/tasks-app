@@ -84,5 +84,63 @@ export const releaseNotesData: Record<string, ReleaseNote[]> = {
       "title": "🎨 Improved Kanban Card Animations",
       "description": "Dragging cards between status columns now provides visual feedback with smooth scale and shadow animations. See your cards respond as you drag them to their new status."
     }
+  ],
+  "1.0.4": [
+    {
+      "title": "🏷️ Full Subtasks Support",
+      "description": "Comprehensive subtask system with full hierarchy support. Create, organize, and track nested tasks up to 3 levels deep. Each subtask maintains its own status, due date, and tags. Collapse/expand subtasks to focus on what matters."
+    },
+    {
+      "title": "📝 Advanced Tag System",
+      "description": "Powerful tag management for organizing tasks. Create custom tags with color-coding, apply multiple tags per task, and filter across tags. Delete tags individually and manage your organizational structure on the fly."
+    },
+    {
+      "title": "🎯 Enhanced Task Filtering",
+      "description": "Filter tasks by tags, subtasks, and custom criteria. Build complex queries to find exactly what you need. Save favorite filters for quick access to your most-used views."
+    },
+    {
+      "title": "⚡ Performance Improvements",
+      "description": "Optimized rendering for large task hierarchies with subtasks. Faster filtering and search across thousands of tasks with nested structures. Smoother animations and interactions."
+    },
+    {
+      "title": "🔧 Bug Fixes & Stability",
+      "description": "Fixed edge cases with subtask synchronization, improved database consistency, and resolved UI glitches with nested task rendering. Enhanced error handling for better reliability."
+    }
+  ],
+  "1.0.5": [
+    {
+      "title": "🔧 Fix: Download No Longer Gets Stuck",
+      "description": "Fixed a bug where the update download would stall indefinitely at a certain percentage. The app now detects when a download has stopped making progress for 60 seconds and shows an error with a Retry button so you can resume without restarting."
+    }
+  ],
+  "1.0.6": [
+    {
+      "title": "🔧 Fix: App Crash on Launch (macOS)",
+      "description": "Fixed a crash at startup caused by a code signature mismatch between the app binary and the Electron framework. The app now launches reliably on all supported macOS versions."
+    }
+  ],
+  "1.0.7": [
+    {
+      "title": "🔧 Fix: App Crash on Launch (macOS)",
+      "description": "Fixed a persistent crash at startup caused by code signature mismatches in the Electron framework bundle. All internal frameworks and helper processes are now signed consistently, resolving the Team ID conflict that prevented the app from launching."
+    }
+  ],
+  "1.0.8": [
+    {
+      "title": "🔧 Fix: App Fails to Start (macOS)",
+      "description": "Fixed a startup failure introduced in 1.0.7 where Hardened Runtime was accidentally enabled without the required JIT entitlements, preventing Electron/V8 from running. The app now launches correctly."
+    }
+  ],
+  "1.0.9": [
+    {
+      "title": "🔧 Fix: Window Not Appearing on Launch",
+      "description": "Fixed an issue where the app launched without showing any window. The main window is now created before any database or release notes initialization, so startup errors can no longer silently prevent the app from opening."
+    }
+  ],
+  "1.0.10": [
+    {
+      "title": "⚡ Live Sync from MCP Server",
+      "description": "Tasks added or modified via the MCP server now appear in the app instantly — no restart required. The app watches the database for external changes and refreshes automatically within milliseconds."
+    }
   ]
 }

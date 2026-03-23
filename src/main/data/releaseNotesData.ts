@@ -137,10 +137,10 @@ export const releaseNotesData: Record<string, ReleaseNote[]> = {
       "description": "Fixed an issue where the app launched without showing any window. The main window is now created before any database or release notes initialization, so startup errors can no longer silently prevent the app from opening."
     }
   ],
-  "1.0.10": [
+  "1.0.11": [
     {
-      "title": "⚡ Live Sync from MCP Server",
-      "description": "Tasks added or modified via the MCP server now appear in the app instantly — no restart required. The app watches the database for external changes and refreshes automatically within milliseconds."
+      "title": "📊 Task Progress Tracking",
+      "description": "You can now track how far along a task is. Open any task and use the new Progress section to set a completion percentage (0%, 25%, 50%, 75%, or 100%) and add a note describing what you're currently working on. A mini progress bar also shows inline in the task list."
     }
   ]
 }

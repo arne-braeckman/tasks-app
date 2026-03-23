@@ -1,7 +1,7 @@
 {
   "name": "tasks-app",
   "private": true,
-  "version": "1.0.5",
+  "version": "1.0.6",
   "main": "./out/main/index.js",
   "scripts": {
     "dev": "electron-vite dev",
@@ -19,6 +19,7 @@
   "build": {
     "appId": "com.tasks-app.desktop",
     "productName": "Tasks",
+    "afterSign": "./scripts/afterSign.cjs",
     "mac": {
       "target": [
         "dmg",
@@ -26,8 +27,8 @@
       ],
       "category": "public.app-category.productivity",
       "icon": "resources/icon.icns",
-      "sign": false,
-      "preAutoEntitlements": false
+      "identity": null,
+      "hardenedRuntime": false
     },
     "dmg": {
       "title": "Tasks",

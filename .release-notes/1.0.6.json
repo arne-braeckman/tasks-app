@@ -1,0 +1,6 @@
+[
+  {
+    "title": "🔧 Fix: App Crash on Launch (macOS)",
+    "description": "Fixed a crash at startup caused by a code signature mismatch between the app binary and the Electron framework. The app now launches reliably on all supported macOS versions."
+  }
+]

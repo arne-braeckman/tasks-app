@@ -1,0 +1,6 @@
+[
+  {
+    "title": "🔧 Fix: Download No Longer Gets Stuck",
+    "description": "Fixed a bug where the update download would stall indefinitely at a certain percentage. The app now detects when a download has stopped making progress for 60 seconds and shows an error with a Retry button so you can resume without restarting."
+  }
+]

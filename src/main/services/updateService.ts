@@ -27,6 +27,15 @@ export interface UpdateStatus {
 }
 
 let currentStatus: UpdateStatus = { state: 'idle' }
+let stallTimer: ReturnType<typeof setTimeout> | null = null
+const STALL_TIMEOUT_MS = 60_000
+
+function clearStallTimer() {
+  if (stallTimer) {
+    clearTimeout(stallTimer)
+    stallTimer = null
+  }
+}
 
 function broadcastStatus(status: UpdateStatus) {
   currentStatus = status
@@ -67,6 +76,7 @@ export function initAutoUpdater() {
   })
 
   autoUpdater.on('download-progress', (progress) => {
+    clearStallTimer()
     broadcastStatus({
       state: 'downloading',
       progress: {
@@ -76,9 +86,17 @@ export function initAutoUpdater() {
         total: progress.total,
       },
     })
+    stallTimer = setTimeout(() => {
+      broadcastStatus({
+        state: 'error',
+        error: 'Download stalled. Check your internet connection and try again.',
+        errorType: 'network',
+      })
+    }, STALL_TIMEOUT_MS)
   })
 
   autoUpdater.on('update-downloaded', (info: UpdateInfo) => {
+    clearStallTimer()
     broadcastStatus({
       state: 'downloaded',
       info: {
@@ -90,6 +108,7 @@ export function initAutoUpdater() {
   })
 
   autoUpdater.on('error', (err) => {
+    clearStallTimer()
     const message = err.message.toLowerCase()
     let errorType: UpdateStatus['errorType'] = 'unknown'
     let userMessage = err.message

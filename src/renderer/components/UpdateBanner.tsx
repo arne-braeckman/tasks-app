@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Download, RefreshCw, X, AlertCircle, ExternalLink } from 'lucide-react'
+import { Download, RefreshCw, X, AlertCircle, ExternalLink, RotateCcw } from 'lucide-react'
 
 interface UpdateStatus {
   state: 'idle' | 'checking' | 'available' | 'not-available' | 'downloading' | 'downloaded' | 'error'
@@ -88,6 +88,13 @@ export default function UpdateBanner() {
             <span className="text-(--color-text-tertiary) flex-shrink-0" style={{ fontSize: '12px' }}>
               {Math.round(status.progress?.percent ?? 0)}%
             </span>
+            <button
+              onClick={() => setDismissed(true)}
+              className="rounded-md text-(--color-text-tertiary) hover:text-(--color-text-secondary) transition-colors flex-shrink-0"
+              style={{ padding: '4px' }}
+            >
+              <X size={14} strokeWidth={2} />
+            </button>
           </div>
         )}
 
@@ -150,6 +157,19 @@ export default function UpdateBanner() {
                 </p>
               )}
             </div>
+
+            {/* Retry option for network/stall errors */}
+            {(status.errorType === 'network' || status.errorType === 'unknown') && (
+              <button
+                onClick={() => window.api?.updater.download()}
+                className="flex items-center gap-1 rounded-lg border border-(--color-border-subtle) text-(--color-text-secondary) font-medium transition-opacity hover:opacity-80 flex-shrink-0"
+                style={{ fontSize: '12px', padding: '6px 10px' }}
+                title="Retry download"
+              >
+                <RotateCcw size={12} strokeWidth={2} />
+                Retry
+              </button>
+            )}
 
             {/* Manual download option */}
             {status.info?.version && (

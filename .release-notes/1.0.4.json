@@ -1,0 +1,22 @@
+[
+  {
+    "title": "🏷️ Full Subtasks Support",
+    "description": "Comprehensive subtask system with full hierarchy support. Create, organize, and track nested tasks up to 3 levels deep. Each subtask maintains its own status, due date, and tags. Collapse/expand subtasks to focus on what matters."
+  },
+  {
+    "title": "📝 Advanced Tag System",
+    "description": "Powerful tag management for organizing tasks. Create custom tags with color-coding, apply multiple tags per task, and filter across tags. Delete tags individually and manage your organizational structure on the fly."
+  },
+  {
+    "title": "🎯 Enhanced Task Filtering",
+    "description": "Filter tasks by tags, subtasks, and custom criteria. Build complex queries to find exactly what you need. Save favorite filters for quick access to your most-used views."
+  },
+  {
+    "title": "⚡ Performance Improvements",
+    "description": "Optimized rendering for large task hierarchies with subtasks. Faster filtering and search across thousands of tasks with nested structures. Smoother animations and interactions."
+  },
+  {
+    "title": "🔧 Bug Fixes & Stability",
+    "description": "Fixed edge cases with subtask synchronization, improved database consistency, and resolved UI glitches with nested task rendering. Enhanced error handling for better reliability."
+  }
+]

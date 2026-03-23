@@ -45,23 +45,26 @@ app.whenReady().then(() => {
   registerIpcHandlers()
   initAutoUpdater()
 
-  // Initialize release notes for the current version
-  const packageJson = JSON.parse(
-    require('fs').readFileSync(join(__dirname, '../../package.json'), 'utf-8')
-  )
-  const currentVersion = packageJson.version
-  const db = getDb()
-
-  // Store release notes data in database if available
-  if (releaseNotesData[currentVersion]) {
-    const releaseNotesService = require('./services/releaseNotesService')
-    releaseNotesService.storeReleaseNotes(db, currentVersion, releaseNotesData[currentVersion])
-  }
-
-  // Initialize and create release note tasks if this is a new version
-  initializeReleaseNotes(db, currentVersion)
-
+  // Create the window first — always, before any other init that might throw
   createWindow()
+
+  // Initialize DB and release notes after window is visible
+  try {
+    const packageJson = JSON.parse(
+      require('fs').readFileSync(join(__dirname, '../../package.json'), 'utf-8')
+    )
+    const currentVersion = packageJson.version
+    const db = getDb()
+
+    if (releaseNotesData[currentVersion]) {
+      const releaseNotesService = require('./services/releaseNotesService')
+      releaseNotesService.storeReleaseNotes(db, currentVersion, releaseNotesData[currentVersion])
+    }
+
+    initializeReleaseNotes(db, currentVersion)
+  } catch (err) {
+    console.error('Initialization error (non-fatal):', err)
+  }
 
   // Auto-check for updates 3s after launch (skip in dev mode)
   if (!process.env['ELECTRON_RENDERER_URL']) {

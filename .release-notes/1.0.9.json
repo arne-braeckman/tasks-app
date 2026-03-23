@@ -1,0 +1,6 @@
+[
+  {
+    "title": "🔧 Fix: Window Not Appearing on Launch",
+    "description": "Fixed an issue where the app launched without showing any window. The main window is now created before any database or release notes initialization, so startup errors can no longer silently prevent the app from opening."
+  }
+]

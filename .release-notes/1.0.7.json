@@ -1,0 +1,6 @@
+[
+  {
+    "title": "🔧 Fix: App Crash on Launch (macOS)",
+    "description": "Fixed a persistent crash at startup caused by code signature mismatches in the Electron framework bundle. All internal frameworks and helper processes are now signed consistently, resolving the Team ID conflict that prevented the app from launching."
+  }
+]

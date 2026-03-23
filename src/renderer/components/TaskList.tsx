@@ -171,6 +171,30 @@ function TaskRow({ task, selected, onSelect, onToggle, onContextMenu, index }: {
               </span>
             ))}
 
+            {/* Task progress */}
+            {!isDone && task.progressPercent > 0 && subtasksTotal === 0 && (
+              <div
+                className="flex items-center gap-1.5"
+                style={{ fontSize: '11.5px', color: 'var(--color-text-tertiary)' }}
+              >
+                <div
+                  className="rounded-full overflow-hidden bg-(--color-border)"
+                  style={{ width: '32px', height: '3px' }}
+                >
+                  <div
+                    className="h-full rounded-full transition-all"
+                    style={{
+                      width: `${task.progressPercent}%`,
+                      background: task.progressPercent === 100
+                        ? 'var(--color-status-done)'
+                        : 'var(--color-accent)',
+                    }}
+                  />
+                </div>
+                <span style={{ fontFamily: 'var(--font-mono)' }}>{task.progressPercent}%</span>
+              </div>
+            )}
+
             {/* Subtask progress */}
             {subtasksTotal > 0 && (
               <div

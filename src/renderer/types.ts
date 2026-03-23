@@ -29,6 +29,8 @@ export interface Task {
   tags: Tag[]
   subtasks: Task[]
   completedAt: string | null
+  progressPercent: number
+  progressNote: string
   createdAt: string
   updatedAt: string
 }

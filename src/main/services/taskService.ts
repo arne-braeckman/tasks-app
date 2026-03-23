@@ -30,6 +30,8 @@ export interface TaskWithDetails {
   parentId: string | null
   sortOrder: number
   completedAt: string | null
+  progressPercent: number
+  progressNote: string
   createdAt: string
   updatedAt: string
   tags: { id: string; name: string; color: string }[]
@@ -99,6 +101,8 @@ function enrichTask(db: DB, row: any): TaskWithDetails {
     parentId: row.parentId,
     sortOrder: row.sortOrder,
     completedAt: row.completedAt,
+    progressPercent: row.progressPercent ?? 0,
+    progressNote: row.progressNote ?? '',
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,
     tags: tagRows,
@@ -117,6 +121,8 @@ export interface CreateTaskInput {
   groupId?: string | null
   parentId?: string | null
   tagIds?: string[]
+  progressPercent?: number
+  progressNote?: string
 }
 
 export function createTask(db: DB, input: CreateTaskInput): TaskWithDetails {
@@ -136,6 +142,8 @@ export function createTask(db: DB, input: CreateTaskInput): TaskWithDetails {
     parentId: input.parentId || null,
     sortOrder: 0,
     completedAt: null,
+    progressPercent: input.progressPercent ?? 0,
+    progressNote: input.progressNote ?? '',
     createdAt: now,
     updatedAt: now,
   }).run()
@@ -160,6 +168,8 @@ export interface UpdateTaskInput {
   groupId?: string | null
   sortOrder?: number
   tagIds?: string[]
+  progressPercent?: number
+  progressNote?: string
 }
 
 export function updateTask(db: DB, id: string, input: UpdateTaskInput): TaskWithDetails | null {
@@ -180,6 +190,8 @@ export function updateTask(db: DB, id: string, input: UpdateTaskInput): TaskWith
   if (input.customer !== undefined) updates.customer = input.customer
   if (input.groupId !== undefined) updates.groupId = input.groupId
   if (input.sortOrder !== undefined) updates.sortOrder = input.sortOrder
+  if (input.progressPercent !== undefined) updates.progressPercent = input.progressPercent
+  if (input.progressNote !== undefined) updates.progressNote = input.progressNote
 
   db.update(tasks).set(updates).where(eq(tasks.id, id)).run()
 

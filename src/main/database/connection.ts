@@ -76,6 +76,9 @@ export function getDb() {
 
     // Migrate: add customer column if not exists
     try { sqlite.exec("ALTER TABLE tasks ADD COLUMN customer TEXT NOT NULL DEFAULT ''") } catch {}
+    // Migrate: add progress columns if not exists
+    try { sqlite.exec("ALTER TABLE tasks ADD COLUMN progress_percent INTEGER NOT NULL DEFAULT 0") } catch {}
+    try { sqlite.exec("ALTER TABLE tasks ADD COLUMN progress_note TEXT NOT NULL DEFAULT ''") } catch {}
 
     // Production: no seed data — starts empty
   }

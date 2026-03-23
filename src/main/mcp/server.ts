@@ -94,6 +94,8 @@ server.tool(
     assignee: z.string().optional().describe('New assignee'),
     group_id: z.string().optional().describe('New group ID'),
     tag_ids: z.array(z.string()).optional().describe('Replace all tags with these tag IDs'),
+    progress_percent: z.number().int().min(0).max(100).optional().describe('Progress percentage (0, 25, 50, 75, or 100)'),
+    progress_note: z.string().optional().describe('Description of current progress / what is being worked on'),
   },
   async ({ task_id, ...params }) => {
     const db = getDb()
@@ -106,6 +108,8 @@ server.tool(
       assignee: params.assignee,
       groupId: params.group_id,
       tagIds: params.tag_ids,
+      progressPercent: params.progress_percent,
+      progressNote: params.progress_note,
     })
     if (!task) return { content: [{ type: 'text', text: 'Task not found' }] }
     return { content: [{ type: 'text', text: JSON.stringify(task, null, 2) }] }

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import {
   X, Trash2, Calendar, User, Flag, FolderOpen,
-  Hash, CheckCircle2, Circle, Clock, AlertCircle, ChevronDown, Building2
+  Hash, CheckCircle2, Circle, Clock, AlertCircle, ChevronDown, Building2, TrendingUp
 } from 'lucide-react'
 import { Task, Group, Tag, Priority, Status } from '../types'
 
@@ -458,6 +458,93 @@ export default function DetailPanel({ task, groups, tags, customers, onClose, on
               No tags available
             </p>
           )}
+        </div>
+
+        {/* Progress */}
+        <div>
+          <div className="h-px bg-(--color-border-subtle)" style={{ margin: '16px 0 12px' }} />
+          <div className="flex items-center gap-2 mb-3" style={{ paddingLeft: '2px' }}>
+            <TrendingUp size={13} strokeWidth={1.75} className="text-(--color-text-tertiary)" />
+            <span className="section-label">Progress</span>
+            {task.progressPercent > 0 && (
+              <span style={{ fontSize: '11px', fontFamily: 'var(--font-mono)', color: 'var(--color-accent)', marginLeft: 'auto', fontWeight: '500' }}>
+                {task.progressPercent}%
+              </span>
+            )}
+          </div>
+
+          <div style={{ paddingLeft: '20px' }}>
+            {/* Progress bar */}
+            <div
+              className="rounded-full overflow-hidden"
+              style={{ height: '3px', background: 'var(--color-border)', marginBottom: '8px' }}
+            >
+              <div
+                className="h-full rounded-full transition-all duration-300"
+                style={{
+                  width: `${task.progressPercent}%`,
+                  background: task.progressPercent === 100
+                    ? 'var(--color-status-done)'
+                    : 'var(--color-accent)',
+                }}
+              />
+            </div>
+
+            {/* Step buttons */}
+            <div className="flex gap-1">
+              {[0, 25, 50, 75, 100].map(step => {
+                const isActive = task.progressPercent === step
+                const isFilled = task.progressPercent > step
+                return (
+                  <button
+                    key={step}
+                    onClick={() => onUpdate({ progressPercent: step })}
+                    className="flex-1 rounded-lg transition-all"
+                    style={{
+                      fontSize: '11px',
+                      padding: '5px 2px',
+                      fontFamily: 'var(--font-mono)',
+                      fontWeight: isActive ? '600' : '400',
+                      background: isActive
+                        ? 'color-mix(in srgb, var(--color-accent) 15%, transparent)'
+                        : isFilled
+                          ? 'color-mix(in srgb, var(--color-accent) 7%, transparent)'
+                          : 'transparent',
+                      color: isActive
+                        ? 'var(--color-accent)'
+                        : isFilled
+                          ? 'color-mix(in srgb, var(--color-accent) 70%, var(--color-text-tertiary))'
+                          : 'var(--color-text-tertiary)',
+                      border: isActive
+                        ? '1px solid color-mix(in srgb, var(--color-accent) 30%, transparent)'
+                        : '1px solid transparent',
+                    }}
+                  >
+                    {step}%
+                  </button>
+                )
+              })}
+            </div>
+
+            {/* Progress note */}
+            {task.progressPercent > 0 && (
+              <textarea
+                key={`${task.id}-pnote`}
+                defaultValue={task.progressNote}
+                onBlur={(e) => onUpdate({ progressNote: e.target.value })}
+                rows={2}
+                placeholder="What are you working on…"
+                className="w-full bg-transparent rounded-xl outline-none resize-none leading-relaxed"
+                style={{
+                  fontSize: '13px',
+                  color: 'var(--color-text-secondary)',
+                  border: '1px solid var(--color-border)',
+                  padding: '8px 10px',
+                  marginTop: '10px',
+                }}
+              />
+            )}
+          </div>
         </div>
 
         {/* Subtasks */}

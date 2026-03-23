@@ -23,6 +23,8 @@ export const tasks = sqliteTable('tasks', {
   parentId: text('parent_id'),
   sortOrder: integer('sort_order').notNull().default(0),
   completedAt: text('completed_at'),
+  progressPercent: integer('progress_percent').notNull().default(0),
+  progressNote: text('progress_note').notNull().default(''),
   createdAt: text('created_at').notNull(),
   updatedAt: text('updated_at').notNull(),
 }, (table) => [

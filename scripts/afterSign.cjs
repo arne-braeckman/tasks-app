@@ -18,7 +18,7 @@ const path = require('path')
 const fs = require('fs')
 
 function sign(target) {
-  execSync(`codesign --force --options runtime --sign - "${target}"`, { stdio: 'pipe' })
+  execSync(`codesign --force --sign - "${target}"`, { stdio: 'pipe' })
 }
 
 function signDir(dir, ext) {

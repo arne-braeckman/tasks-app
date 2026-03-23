@@ -1,0 +1,6 @@
+[
+  {
+    "title": "🔧 Fix: App Fails to Start (macOS)",
+    "description": "Fixed a startup failure introduced in 1.0.7 where Hardened Runtime was accidentally enabled without the required JIT entitlements, preventing Electron/V8 from running. The app now launches correctly."
+  }
+]
